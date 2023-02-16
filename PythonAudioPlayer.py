@@ -59,45 +59,47 @@ def main_program():
         # Get the current song playing
         if playlist.get(ACTIVE):
             current_song = playlist.curselection()
-            song = playlist.get(current_song)
-            song_mutagen = MP3(song)
-            #Get the length of the song
-            global song_length
-            song_length = song_mutagen.info.length
-            # Change the format
-            converted_song_length = time.strftime("%M:%S",time.gmtime(song_length))
+            try:
+                song = playlist.get(current_song)
+                song_mutagen = MP3(song)
+                #Get the length of the song
+                global song_length
+                song_length = song_mutagen.info.length
+                # Change the format
+                converted_song_length = time.strftime("%M:%S",time.gmtime(song_length))
        
-            current_time +=1
+                current_time +=1
+            except IndexError:
 
 
 
-            if int(song_slider.get()) == int(song_length):
-                status_bar.config(text=f"Time Elapsed: {converted_song_length} ")
+                if int(song_slider.get()) == int(song_length):
+                    status_bar.config(text=f"Time Elapsed: {converted_song_length} ")
 
-            elif paused:
-                pass
+                elif paused:
+                    pass
 
 
-            elif int(song_slider.get()) == int(current_time):
-                #Slider not moved--
-                # Update the slider
-                slider_position = int(song_length)
-                song_slider.config(to=slider_position, value=int(current_time))
-            else:
-                #Slider moved--
-                # Update the slider
-                slider_position = int(song_length)
-                song_slider.configure(to=slider_position, value=int(song_slider.get()))
-                # Convert to time foormat
-                converted_current_time = time.strftime("%M:%S",time.gmtime(int(song_slider.get())))
+                elif int(song_slider.get()) == int(current_time):
+                    #Slider not moved--
+                    # Update the slider
+                    slider_position = int(song_length)
+                    song_slider.config(to=slider_position, value=int(current_time))
+                else:
+                    #Slider moved--
+                    # Update the slider
+                    slider_position = int(song_length)
+                    song_slider.configure(to=slider_position, value=int(song_slider.get()))
+                    # Convert to time foormat
+                    converted_current_time = time.strftime("%M:%S",time.gmtime(int(song_slider.get())))
 
-                status_bar.config(text=f"Time Elapsed: {converted_current_time} of {converted_song_length} ")
+                    status_bar.config(text=f"Time Elapsed: {converted_current_time} of {converted_song_length} ")
 
-                next_time = int(song_slider.get()) + 1 
-                song_slider.config(value=next_time)
+                    next_time = int(song_slider.get()) + 1 
+                    song_slider.config(value=next_time)
 
-            #keeps the function updated
-            status_bar.after(reapter_for_sb,play_time_bar)
+                #keeps the function updated
+                status_bar.after(reapter_for_sb,play_time_bar)
 
 
     def add_many_songs():
@@ -226,26 +228,30 @@ def main_program():
 
         #Current song played
         next_one = playlist.curselection()
-        next_one = next_one[0]+1
-        song = playlist.get(next_one)
-
-        #Plays the next song
         try:
-            mixer.music.load(song)
-            mixer.music.play()
-        except FileNotFoundError:
-            pass
+            next_one = next_one[0]+1
+            song = playlist.get(next_one)
+
+            #Plays the next song
+            try:
+                mixer.music.load(song)
+                mixer.music.play()
+            except FileNotFoundError:
+                pass
     
-        #Updates the bar in the playlist
-        playlist.selection_clear(0, END)
-        #Moves to the next song
-        playlist.activate(next_one)
-        playlist.select_set(next_one, last=None)
+            #Updates the bar in the playlist
+            playlist.selection_clear(0, END)
+            #Moves to the next song
+            playlist.activate(next_one)
+            playlist.select_set(next_one, last=None)
 
-        music_name=playlist.get(ACTIVE)
+            music_name=playlist.get(ACTIVE)
 
-        music_name = music_name.replace("H:/T-Level/Mp3AudioPlayer/Music/SnapSave.io -","")
-        music.config(text=music_name[0:-4])
+            music_name = music_name.replace("H:/T-Level/Mp3AudioPlayer/Music/SnapSave.io -","")
+            music.config(text=music_name[0:-4])
+        except IndexError:
+            pass
+        
 
 
     def PreviousSong():
@@ -257,22 +263,28 @@ def main_program():
         status_bar.config(text="")
 
         #Current song played
-        next_one = playlist.curselection()
-        next_one = next_one[0]-1
-        song = playlist.get(next_one)
+        next_one = playlist.curselection() 
+        try:
+            next_one = next_one[0]-1
+            song = playlist.get(next_one)
 
-        #Plays the next song
-        mixer.music.load(song)
-        mixer.music.play()
+            #Plays the next song
+            try:
+                mixer.music.load(song)
+                mixer.music.play()
+            except FileNotFoundError:
+                pass
     
-        #Updates the bar in the playlist
-        playlist.selection_clear(0, END)
-        #Moves to the next song
-        playlist.activate(next_one)
-        playlist.select_set(next_one, last=None)
+            #Updates the bar in the playlist
+            playlist.selection_clear(0, END)
+            #Moves to the next song
+            playlist.activate(next_one)
+            playlist.select_set(next_one, last=None)
 
-        music_name=playlist.get(ACTIVE)
-        music.config(text=music_name[0:-4])
+            music_name=playlist.get(ACTIVE)
+            music.config(text=music_name[0:-4])
+        except IndexError:
+            pass
 
 
     def Import_Youtube_Playlist():
@@ -462,10 +474,6 @@ def main_program():
 
         selection_listbox.delete(ACTIVE)
 
-        #for content in range(playlist.size):
-            #stuff.append(playlist[content])
-
-       #print(stuff)
 
     
     def load_playlist():
@@ -530,17 +538,6 @@ def main_program():
     insert_label4 = customtkinter.CTkLabel(master=tabview.tab("PlayList"),text="automatically into a texfile and compatible",font=("arial",9))
     insert_label4.place(x=280,y=340,anchor="w")
 
-
-
-
-
-
-
-
-
-
-
-
     #ListBox
         #Music viewer
     music_frame2 = tk.Frame(master=tabview.tab("PlayList"), bd=1, relief=RIDGE)
@@ -565,6 +562,5 @@ def main_program():
 
    
     root.mainloop()
-
 
 main_program()
